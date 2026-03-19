@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive English Course</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .lesson-section { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .lesson-section.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom styling for practice dropdowns */
+        select.practice-dropdown {
+            appearance: none;
+            background-color: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            border-radius: 0.5rem;
+            padding: 0.25rem 2rem 0.25rem 0.75rem;
+            font-weight: 600;
+            color: #4f46e5;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234f46e5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1em;
+            transition: all 0.2s;
+        }
+        select.practice-dropdown:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2); }
+        select.practice-dropdown.correct { border-color: #10b981; color: #10b981; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2310b981'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 13l4 4L19 7'%3E%3C/path%3E%3C/svg%3E"); }
+        select.practice-dropdown.incorrect { border-color: #ef4444; color: #ef4444; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ef4444'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 18L18 6M6 6l12 12'%3E%3C/path%3E%3C/svg%3E"); }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Navigation & Progress Bar -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <div class="bg-indigo-600 text-white p-2 rounded-lg">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-indigo-900">Engage<span class="text-indigo-600">English</span></span>
+                </div>
+                <div id="user-greeting" class="hidden text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full">
+                    <i class="fa-solid fa-user-graduate mr-2 text-indigo-500"></i><span id="display-name">Student</span>
+                </div>
+            </div>
+        </div>
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-200 h-1.5">
+            <div id="progress-bar" class="bg-indigo-600 h-1.5 transition-all duration-500 ease-out" style="width: 0%;"></div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-4xl mx-auto w-full px-4 py-8 sm:px-6 lg:px-8 flex flex-col">
+        
+        <!-- Registration Section (Lesson 0) -->
+        <section id="lesson-0" class="lesson-section active my-auto">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden md:flex">
+                <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+                    <span class="text-indigo-600 font-semibold tracking-wider uppercase text-sm mb-2">Unit 10: Life Stories</span>
+                    <h1 class="text-4xl font-bold text-slate-900 mb-4">Welcome to your Interactive Course</h1>
+                    <p class="text-slate-600 mb-8 leading-relaxed">Before we begin exploring life events, social life, and personal experiences, please register below to track your progress through our 5-lesson class.</p>
+                    
+                    <form id="registration-form" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">First Name</label>
+                                <input type="text" id="fname" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="Jane">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Last Name</label>
+                                <input type="text" id="lname" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="Doe">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                            <input type="email" id="email" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="jane@example.com">
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 mt-4 flex justify-center items-center gap-2">
+                            Start Learning <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </form>
+                </div>
+                <div class="md:w-1/2 bg-indigo-50 hidden md:block relative">
+                    <img src="https://images.unsplash.com/photo-1513258496099-48168024aec0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Student learning" class="absolute inset-0 w-full h-full object-cover">
+                </div>
+            </div>
+        </section>
+
+        <!-- Lesson 1: Reading -->
+        <section id="lesson-1" class="lesson-section">
+            <div class="mb-8">
+                <span class="bg-indigo-100 text-indigo-800 text-sm font-semibold px-3 py-1 rounded-full">Lesson 1 of 5</span>
+                <h2 class="text-3xl font-bold mt-4 text-slate-900">A Brave Life</h2>
+                <p class="text-slate-600 mt-2 text-lg">Reading skills and identifying past actions.</p>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 flex flex-col md:flex-row gap-8">
+                <div class="md:w-1/3">
+                    <img src="https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Books" class="rounded-xl w-full h-48 md:h-full object-cover shadow-md">
+                </div>
+                <div class="md:w-2/3">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-book-open-reader text-indigo-500"></i> An Inspiration For All</h3>
+                    <p class="text-slate-600 mb-4">Read the biography milestones of an inspiring figure. Notice the verbs describing actions in the past.</p>
+                    
+                    <ul class="space-y-4 relative border-l-2 border-indigo-200 ml-3 pl-5">
+                        <li class="relative">
+                            <span class="absolute -left-[29px] bg-indigo-500 w-4 h-4 rounded-full border-4 border-white"></span>
+                            <span class="font-bold text-indigo-600">1997:</span> Malala Yousafzai <strong>was</strong> born in Pakistan. Her father <strong>was</strong> an educator.
+                        </li>
+                        <li class="relative">
+                            <span class="absolute -left-[29px] bg-indigo-500 w-4 h-4 rounded-full border-4 border-white"></span>
+                            <span class="font-bold text-indigo-600">2008:</span> She <strong>wrote</strong> a blog for British TV about her life.
+                        </li>
+                        <li class="relative">
+                            <span class="absolute -left-[29px] bg-indigo-500 w-4 h-4 rounded-full border-4 border-white"></span>
+                            <span class="font-bold text-indigo-600">2012:</span> She <strong>survived</strong> a terrible attack and <strong>continued</strong> her advocacy.
+                        </li>
+                        <li class="relative">
+                            <span class="absolute -left-[29px] bg-indigo-500 w-4 h-4 rounded-full border-4 border-white"></span>
+                            <span class="font-bold text-indigo-600">2013:</span> She <strong>started</strong> the Malala Fund.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-8 flex justify-end">
+                <button onclick="nextLesson()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 shadow-md">
+                    Continue to Lesson 2 <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Lesson 2: Vocabulary -->
+        <section id="lesson-2" class="lesson-section">
+            <div class="mb-8">
+                <span class="bg-indigo-100 text-indigo-800 text-sm font-semibold px-3 py-1 rounded-full">Lesson 2 of 5</span>
+                <h2 class="text-3xl font-bold mt-4 text-slate-900">Social Life Vocabulary</h2>
+                <p class="text-slate-600 mt-2 text-lg">Learn collocations related to social activities.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Hang Out</h3>
+                    <p class="text-slate-600">To spend time relaxing or socializing informally.</p>
+                    <div class="mt-4 p-3 bg-slate-50 rounded-lg text-sm text-left">
+                        <span class="font-semibold text-indigo-600">Example:</span> "I <strong>hung out</strong> with my friends yesterday."
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                        <i class="fa-solid fa-utensils"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Eat Out</h3>
+                    <p class="text-slate-600">To eat at a restaurant rather than at home.</p>
+                    <div class="mt-4 p-3 bg-slate-50 rounded-lg text-sm text-left">
+                        <span class="font-semibold text-indigo-600">Example:</span> "We <strong>ate out</strong> at a nice Italian place."
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                        <i class="fa-solid fa-film"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">See a Movie</h3>
+                    <p class="text-slate-600">To go to the cinema to watch a film.</p>
+                    <div class="mt-4 p-3 bg-slate-50 rounded-lg text-sm text-left">
+                        <span class="font-semibold text-indigo-600">Example:</span> "They <strong>saw a movie</strong> last weekend."
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-between">
+                <button onclick="prevLesson()" class="text-slate-500 hover:text-slate-800 font-semibold py-3 px-6 rounded-lg transition duration-200">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Back
+                </button>
+                <button onclick="nextLesson()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 shadow-md">
+                    Continue to Lesson 3 <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Lesson 3: Grammar Explanation -->
+        <section id="lesson-3" class="lesson-section">
+            <div class="mb-8">
+                <span class="bg-indigo-100 text-indigo-800 text-sm font-semibold px-3 py-1 rounded-full">Lesson 3 of 5</span>
+                <h2 class="text-3xl font-bold mt-4 text-slate-900">Grammar Deep Dive: Simple Past</h2>
+                <p class="text-slate-600 mt-2 text-lg">Mastering affirmative, negative, and question forms.</p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Affirmative -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-indigo-50 px-6 py-4 border-b border-slate-200">
+                        <h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2"><i class="fa-solid fa-plus-circle text-indigo-500"></i> Affirmative Statements</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="mb-4 text-slate-600">For regular verbs, add <strong>-ed</strong> to the base verb. Irregular verbs must be memorized.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <span class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Regular</span>
+                                <ul class="space-y-2">
+                                    <li>work &rarr; <span class="text-indigo-600 font-semibold">worked</span></li>
+                                    <li>live &rarr; <span class="text-indigo-600 font-semibold">lived</span></li>
+                                </ul>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <span class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Irregular</span>
+                                <ul class="space-y-2">
+                                    <li>go &rarr; <span class="text-indigo-600 font-semibold">went</span></li>
+                                    <li>eat &rarr; <span class="text-indigo-600 font-semibold">ate</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Negatives & Questions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-rose-50 px-6 py-4 border-b border-rose-100">
+                            <h3 class="text-xl font-bold text-rose-900 flex items-center gap-2"><i class="fa-solid fa-minus-circle text-rose-500"></i> Negative Form</h3>
+                        </div>
+                        <div class="p-6">
+                            <p class="mb-4 text-slate-600">Use <strong>did not</strong> (didn't) + base verb.</p>
+                            <div class="bg-slate-800 text-white p-4 rounded-lg font-mono text-sm mb-4">
+                                Subject + didn't + base verb
+                            </div>
+                            <ul class="space-y-2 text-slate-700">
+                                <li><i class="fa-solid fa-check text-green-500 mr-2"></i>I <strong>didn't want</strong> to go.</li>
+                                <li><i class="fa-solid fa-xmark text-red-500 mr-2"></i><span class="line-through text-slate-400">I didn't wanted to go.</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-amber-50 px-6 py-4 border-b border-amber-100">
+                            <h3 class="text-xl font-bold text-amber-900 flex items-center gap-2"><i class="fa-solid fa-circle-question text-amber-500"></i> Question Form</h3>
+                        </div>
+                        <div class="p-6">
+                            <p class="mb-4 text-slate-600">Use <strong>did</strong> before the subject.</p>
+                            <div class="bg-slate-800 text-white p-4 rounded-lg font-mono text-sm mb-4">
+                                (Wh-) + did + subject + base verb
+                            </div>
+                            <ul class="space-y-2 text-slate-700">
+                                <li><strong>Did</strong> you <strong>go</strong> out?</li>
+                                <li>Where <strong>did</strong> they <strong>eat</strong>?</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-between">
+                <button onclick="prevLesson()" class="text-slate-500 hover:text-slate-800 font-semibold py-3 px-6 rounded-lg transition duration-200">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Back
+                </button>
+                <button onclick="nextLesson()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 shadow-md">
+                    Continue to Lesson 4 <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Lesson 4: Make, Get, Have -->
+        <section id="lesson-4" class="lesson-section">
+            <div class="mb-8">
+                <span class="bg-indigo-100 text-indigo-800 text-sm font-semibold px-3 py-1 rounded-full">Lesson 4 of 5</span>
+                <h2 class="text-3xl font-bold mt-4 text-slate-900">In My Experience</h2>
+                <p class="text-slate-600 mt-2 text-lg">Using collocations with Make, Get, and Have.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                    <div class="pt-4 md:pt-0 md:px-4 flex flex-col items-center text-center">
+                        <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4 text-xl"><i class="fa-solid fa-hammer"></i></div>
+                        <h3 class="font-bold text-xl mb-2">Make</h3>
+                        <p class="text-sm text-slate-500 mb-4">Creating, deciding, or producing something.</p>
+                        <ul class="text-left w-full space-y-2 bg-slate-50 p-4 rounded-lg">
+                            <li><i class="fa-solid fa-caret-right text-indigo-400 mr-2"></i>make a mistake</li>
+                            <li><i class="fa-solid fa-caret-right text-indigo-400 mr-2"></i>make a friend</li>
+                            <li><i class="fa-solid fa-caret-right text-indigo-400 mr-2"></i>make a decision</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="pt-8 md:pt-0 md:px-4 flex flex-col items-center text-center">
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4 text-xl"><i class="fa-solid fa-bolt"></i></div>
+                        <h3 class="font-bold text-xl mb-2">Get</h3>
+                        <p class="text-sm text-slate-500 mb-4">A change in state, emotion, or situation.</p>
+                        <ul class="text-left w-full space-y-2 bg-slate-50 p-4 rounded-lg">
+                            <li><i class="fa-solid fa-caret-right text-emerald-400 mr-2"></i>get upset</li>
+                            <li><i class="fa-solid fa-caret-right text-emerald-400 mr-2"></i>get lost</li>
+                            <li><i class="fa-solid fa-caret-right text-emerald-400 mr-2"></i>get a job</li>
+                        </ul>
+                    </div>
+
+                    <div class="pt-8 md:pt-0 md:px-4 flex flex-col items-center text-center">
+                        <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-4 text-xl"><i class="fa-solid fa-hand-holding-heart"></i></div>
+                        <h3 class="font-bold text-xl mb-2">Have</h3>
+                        <p class="text-sm text-slate-500 mb-4">Experiencing an event or feeling.</p>
+                        <ul class="text-left w-full space-y-2 bg-slate-50 p-4 rounded-lg">
+                            <li><i class="fa-solid fa-caret-right text-purple-400 mr-2"></i>have fun</li>
+                            <li><i class="fa-solid fa-caret-right text-purple-400 mr-2"></i>have a party</li>
+                            <li><i class="fa-solid fa-caret-right text-purple-400 mr-2"></i>have a problem</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-between">
+                <button onclick="prevLesson()" class="text-slate-500 hover:text-slate-800 font-semibold py-3 px-6 rounded-lg transition duration-200">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Back
+                </button>
+                <button onclick="nextLesson()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 shadow-md">
+                    Continue to Lesson 5 <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Lesson 5: Interactive Workbook -->
+        <section id="lesson-5" class="lesson-section">
+            <div class="mb-8">
+                <span class="bg-indigo-100 text-indigo-800 text-sm font-semibold px-3 py-1 rounded-full">Lesson 5 of 5</span>
+                <h2 class="text-3xl font-bold mt-4 text-slate-900">Workbook Practice</h2>
+                <p class="text-slate-600 mt-2 text-lg">Test your knowledge! Select the correct verbs to complete the story.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="md:flex">
+                    <div class="md:w-2/5 bg-slate-100">
+                        <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Airplane in sky" class="h-full w-full object-cover opacity-90">
+                    </div>
+                    <div class="md:w-3/5 p-6 md:p-8">
+                        <h3 class="text-2xl font-bold mb-6 text-slate-800">Flying High</h3>
+                        <div class="space-y-6 text-lg leading-loose text-slate-700">
+                            
+                            <p>
+                                1. Jessica 
+                                <select id="q1" class="practice-dropdown mx-2">
+                                    <option value="">Select verb...</option>
+                                    <option value="decided">decided</option>
+                                    <option value="graduated">graduated</option>
+                                    <option value="received">received</option>
+                                </select> 
+                                to accept the challenge she was born with.
+                            </p>
+                            
+                            <p>
+                                2. In 2005, she 
+                                <select id="q2" class="practice-dropdown mx-2">
+                                    <option value="">Select verb...</option>
+                                    <option value="graduated">graduated</option>
+                                    <option value="trained">trained</option>
+                                    <option value="wrote">wrote</option>
+                                </select> 
+                                from college with a degree in psychology.
+                            </p>
+                            
+                            <p>
+                                3. She flew an aircraft using only her feet and 
+                                <select id="q3" class="practice-dropdown mx-2">
+                                    <option value="">Select verb...</option>
+                                    <option value="received">received</option>
+                                    <option value="made">made</option>
+                                    <option value="was">was</option>
+                                </select> 
+                                an award from Guinness World Records.
+                            </p>
+
+                        </div>
+
+                        <div id="feedback-message" class="hidden mt-6 p-4 rounded-lg font-medium text-center"></div>
+
+                        <div class="mt-8 flex gap-4">
+                            <button onclick="checkAnswers()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 shadow-md flex justify-center items-center gap-2">
+                                <i class="fa-solid fa-check-double"></i> Check Answers
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-between">
+                <button onclick="prevLesson()" class="text-slate-500 hover:text-slate-800 font-semibold py-3 px-6 rounded-lg transition duration-200">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Back
+                </button>
+                <button id="finish-course-btn" onclick="finishCourse()" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 shadow-md">
+                    Finish Course <i class="fa-solid fa-flag-checkered ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Completion Section -->
+        <section id="completion" class="lesson-section my-auto text-center">
+            <div class="bg-white rounded-2xl shadow-xl p-10 max-w-2xl mx-auto border border-emerald-100">
+                <div class="w-24 h-24 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-slate-900 mb-4">Course Complete!</h2>
+                <p class="text-xl text-slate-600 mb-8">Congratulations, <span id="cert-name" class="font-bold text-indigo-600">Student</span>! You have successfully finished the 5-Lesson Unit on Life Stories.</p>
+                <div class="bg-slate-50 p-4 rounded-xl inline-block border border-slate-200">
+                    <p class="text-emerald-600 font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Progress Saved to your profile.
+                    </p>
+                </div>
+                <div class="mt-8">
+                    <button onclick="location.reload()" class="text-slate-500 hover:text-slate-800 font-semibold py-2 px-4 transition underline">Restart Course</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-auto">
+        <div class="max-w-5xl mx-auto px-4 py-6 sm:px-6 lg:px-8 text-center text-slate-500 text-sm">
+            &copy; 2026 EngageEnglish Interactive. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- Interactive Logic -->
+    <script>
+        let currentLesson = 0;
+        const totalLessons = 5;
+        let userData = { firstName: '', lastName: '', email: '' };
+
+        // DOM Elements
+        const progressBar = document.getElementById('progress-bar');
+        const sections = document.querySelectorAll('.lesson-section');
+        const regForm = document.getElementById('registration-form');
+        const userGreeting = document.getElementById('user-greeting');
+        const displayName = document.getElementById('display-name');
+        const certName = document.getElementById('cert-name');
+
+        // Registration handler
+        regForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            userData.firstName = document.getElementById('fname').value;
+            userData.lastName = document.getElementById('lname').value;
+            userData.email = document.getElementById('email').value;
+            
+            // Update UI with user name
+            displayName.textContent = userData.firstName;
+            certName.textContent = userData.firstName + ' ' + userData.lastName;
+            userGreeting.classList.remove('hidden');
+            userGreeting.classList.add('inline-flex', 'items-center');
+
+            nextLesson();
+        });
+
+        function updateUI() {
+            // Hide all sections
+            sections.forEach(sec => sec.classList.remove('active'));
+            
+            // Show target section
+            if(currentLesson <= totalLessons) {
+                document.getElementById(`lesson-${currentLesson}`).classList.add('active');
+            } else {
+                document.getElementById('completion').classList.add('active');
+            }
+
+            // Update Progress Bar
+            // Lesson 0 = 0%, Lesson 1 = 20%, ..., Completion = 100%
+            let progressPercentage = (currentLesson / totalLessons) * 100;
+            if (progressPercentage > 100) progressPercentage = 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function nextLesson() {
+            if (currentLesson < totalLessons + 1) {
+                currentLesson++;
+                updateUI();
+            }
+        }
+
+        function prevLesson() {
+            if (currentLesson > 1) { // Prevent going back to registration
+                currentLesson--;
+                updateUI();
+            }
+        }
+
+        function finishCourse() {
+            currentLesson++; // Moves to completion screen
+            updateUI();
+        }
+
+        // Dropdown Logic for Lesson 5
+        function checkAnswers() {
+            const answers = {
+                q1: 'decided',
+                q2: 'graduated',
+                q3: 'received'
+            };
+
+            let correctCount = 0;
+
+            for (const [id, correctVal] of Object.entries(answers)) {
+                const selectEl = document.getElementById(id);
+                const userVal = selectEl.value;
+
+                // Reset classes
+                selectEl.classList.remove('correct', 'incorrect');
+
+                if (userVal === correctVal) {
+                    selectEl.classList.add('correct');
+                    correctCount++;
+                } else if (userVal !== "") {
+                    selectEl.classList.add('incorrect');
+                }
+            }
+
+            const feedbackEl = document.getElementById('feedback-message');
+            feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-700', 'bg-rose-100', 'text-rose-700', 'bg-amber-100', 'text-amber-700');
+            
+            if (correctCount === 3) {
+                feedbackEl.textContent = "Great job! All answers are correct.";
+                feedbackEl.classList.add('bg-emerald-100', 'text-emerald-700');
+                document.getElementById('finish-course-btn').classList.remove('hidden');
+            } else if (correctCount > 0) {
+                feedbackEl.textContent = `You got ${correctCount} out of 3 right. Keep trying!`;
+                feedbackEl.classList.add('bg-amber-100', 'text-amber-800');
+            } else {
+                feedbackEl.textContent = "Please select answers to check.";
+                feedbackEl.classList.add('bg-rose-100', 'text-rose-700');
+            }
+        }
+
+        // Dropdown change listener to remove red styling when user tries again
+        document.querySelectorAll('.practice-dropdown').forEach(dropdown => {
+            dropdown.addEventListener('change', function() {
+                this.classList.remove('incorrect', 'correct');
+            });
+        });
+
+    </script>
+</body>
+</html>
+```
